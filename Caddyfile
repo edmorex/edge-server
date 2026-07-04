@@ -38,23 +38,19 @@ edmorex.com, www.edmorex.com {
 	}
 }
 
-# ── BasecaBot (ENABLE LATER — see §7) ──────────────────────────────────────
-# Uncomment this whole block only AFTER the bot has been refactored to drop its
-# own Caddy and join the `edge` network. Until then, leave it commented so Caddy
-# doesn't try (and fail) to serve bot.edmorex.com from here.
-#
-# bot.edmorex.com {
-# 	encode zstd gzip
-#
-# 	# Secure WebSocket hub: wss://bot.edmorex.com/ws?room=...&secret=...
-# 	handle /ws* {
-# 		reverse_proxy bot:8080
-# 	}
-#
-# 	# Bot's bundled web apps (served from a mount of the bot repo's webapps/).
-# 	handle_path /wheel*  { root * /srv/botapps/baseca-wheel; file_server }
-# 	handle_path /sample* { root * /srv/botapps/sample-game;  file_server }
-# 	handle_path /events* { root * /srv/botapps/event-sim;    file_server }
-#
-# 	handle { respond "BasecaBot is running." 200 }
-# }
+# ── BasecaBot ──────────────────────────────────────────────────────────────
+bot.edmorex.com {
+	encode zstd gzip
+
+	# Secure WebSocket hub: wss://bot.edmorex.com/ws?room=...&secret=...
+	handle /ws* {
+		reverse_proxy bot:8080
+	}
+
+	# Bot's bundled web apps (served from a mount of the bot repo's webapps/).
+	handle_path /wheel*  { root * /srv/botapps/baseca-wheel; file_server }
+	handle_path /sample* { root * /srv/botapps/sample-game;  file_server }
+	handle_path /events* { root * /srv/botapps/event-sim;    file_server }
+
+	handle { respond "BasecaBot is running." 200 }
+}

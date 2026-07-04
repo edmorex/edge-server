@@ -16,6 +16,7 @@ services:
       - ./sites:/srv/sites:ro
       - caddy_data:/data # persists issued TLS certificates — do not delete casually
       - caddy_config:/config
+      - ${HOME}/BasecaBot/webapps:/srv/botapps:ro
     networks:
       - edge
 
