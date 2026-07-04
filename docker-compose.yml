@@ -1,0 +1,28 @@
+# edge-server: the host's dedicated edge reverse proxy.
+# The ONLY thing that binds ports 80/443. All apps sit behind it on the
+# external "edge" network and are served as static files or reverse-proxied.
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./sites:/srv/sites:ro
+      - caddy_data:/data # persists issued TLS certificates — do not delete casually
+      - caddy_config:/config
+    networks:
+      - edge
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  edge:
+    external: true # created once with: docker network create edge
