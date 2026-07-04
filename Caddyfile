@@ -48,9 +48,20 @@ bot.edmorex.com {
 	}
 
 	# Bot's bundled web apps (served from a mount of the bot repo's webapps/).
-	handle_path /wheel*  { root * /srv/botapps/baseca-wheel; file_server }
-	handle_path /sample* { root * /srv/botapps/sample-game;  file_server }
-	handle_path /events* { root * /srv/botapps/event-sim;    file_server }
+	handle_path /wheel* {
+		root * /srv/botapps/baseca-wheel
+		file_server
+	}
+	handle_path /sample* {
+		root * /srv/botapps/sample-game
+		file_server
+	}
+	handle_path /events* {
+		root * /srv/botapps/event-sim
+		file_server
+	}
 
-	handle { respond "BasecaBot is running." 200 }
+	handle {
+		respond "BasecaBot is running." 200
+	}
 }
