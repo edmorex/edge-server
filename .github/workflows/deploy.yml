@@ -33,5 +33,9 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           # Pipe the version-controlled deploy script to the server and run it,
           # so the script that runs is always the one reviewed in this commit.
-          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes \
+          ssh -i "$HOME/.ssh/deploy_key" \
+              -o IdentitiesOnly=yes \
+              -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+              -o GlobalKnownHostsFile=/dev/null \
+              -o StrictHostKeyChecking=yes \
               "$SSH_USER@$SSH_HOST" 'bash -s' < scripts/deploy.sh
