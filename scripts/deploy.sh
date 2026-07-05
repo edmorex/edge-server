@@ -23,7 +23,7 @@ echo "==> Validating the new Caddyfile"
 # so validating via `exec` on the running container would check a stale file.
 # `run` doesn't publish ports, so there's no clash with the live proxy on 80/443.
 # If the config is broken this fails here (set -e), leaving the live proxy untouched.
-docker compose run --rm --no-deps caddy \
+docker compose run --rm --no-deps --entrypoint caddy caddy \
   validate --config /etc/caddy/Caddyfile
 
 echo "==> Applying the new Caddyfile"
