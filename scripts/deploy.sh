@@ -16,14 +16,22 @@ echo "==> Applying compose stack"
 docker compose pull --quiet
 docker compose up -d
 
-echo "==> Validating Caddyfile before reload"
-# The Caddyfile is bind-mounted, so the running container already sees the new
-# file after the git reset above. Validate first so a broken config can't take
-# down the live proxy; only reload if it passes.
-docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile
+echo "==> Validating the new Caddyfile"
+# Validate in a throwaway container. A fresh container binds the CURRENT
+# Caddyfile, whereas the long-running caddy's single-file bind mount can still
+# point at the pre-git-reset inode (Docker binds the file by inode at start),
+# so validating via `exec` on the running container would check a stale file.
+# `run` doesn't publish ports, so there's no clash with the live proxy on 80/443.
+# If the config is broken this fails here (set -e), leaving the live proxy untouched.
+docker compose run --rm --no-deps caddy \
+  validate --config /etc/caddy/Caddyfile
 
-echo "==> Reloading Caddy (zero downtime)"
-docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile
+echo "==> Applying the new Caddyfile"
+# Recreate the caddy container so its bind mount re-resolves to the new file.
+# A plain `caddy reload` would re-read the stale mount and change nothing.
+# Certs persist in the caddy_data volume, so this does NOT re-hit Let's Encrypt;
+# it's a ~1s connection blip, not a re-issuance.
+docker compose up -d --force-recreate caddy
 
 echo "==> Current state"
 docker compose ps
