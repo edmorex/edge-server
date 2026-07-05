@@ -62,6 +62,6 @@ bot.edmorex.com {
 	}
 
 	handle {
-		respond "BasecaBot is running." 200
+		reverse_proxy bot:8090
 	}
 }
