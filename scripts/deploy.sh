@@ -23,8 +23,12 @@ echo "==> Validating the new Caddyfile"
 # so validating via `exec` on the running container would check a stale file.
 # `run` doesn't publish ports, so there's no clash with the live proxy on 80/443.
 # If the config is broken this fails here (set -e), leaving the live proxy untouched.
-docker compose run --rm --no-deps --entrypoint caddy caddy \
-  validate --config /etc/caddy/Caddyfile
+# NB: `-T` and `</dev/null` are essential here. This script is delivered to the
+# server via `ssh 'bash -s' < deploy.sh`, so bash reads it from stdin. Without
+# these, `docker compose run` attaches to that same stdin and swallows the rest
+# of the script — the deploy would silently stop here with exit 0.
+docker compose run --rm --no-deps -T --entrypoint caddy caddy \
+  validate --config /etc/caddy/Caddyfile </dev/null
 
 echo "==> Applying the new Caddyfile"
 # Recreate the caddy container so its bind mount re-resolves to the new file.
